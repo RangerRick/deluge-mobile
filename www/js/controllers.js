@@ -15,6 +15,24 @@ angular.module('dm.controllers', [
 			scope.height = attrs.dmHeight || '10px';
 			scope.state = attrs.dmState;
 			scope.progress = attrs.dmProgress;
+
+			attrs.$observe('dmState', function(newValue) {
+				scope.state = newValue;
+			});
+			attrs.$observe('dmProgress', function(newValue) {
+				scope.progress = newValue;
+			});
+			/*
+			scope.getBackgroundSize = function() {
+				var progress = parseFloat(scope.progress, 10);
+				if (progress === NaN) {
+					progress = '0';
+				} else {
+					progress = progress.toFixed(2);
+				}
+				return progress+'% ' + scope.height;
+			};
+			*/
 		}
 	};
 })
