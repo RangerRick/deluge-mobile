@@ -1,0 +1,108 @@
+<style>
+	.item {
+		border-top: 1px solid #555;
+	}
+	.item-complex .item-content {
+		padding: 0;
+		border-left: 1px solid #555;
+		border-right: 1px solid #555;
+	}
+	.item-repad {
+		height: 47px;
+		margin-left: -15px;
+		padding-top: 22px;
+		padding-bottom: 3px;
+		padding-left: 2px;
+		padding-right: 5px;
+		display: inline-block;
+		text-overflow: ellipsis;
+		font-size: 14px;
+		z-index: 100;
+		color: black;
+		font-weight: 900;
+		/* text-shadow: 1px 1px 2px rgba(100,100,100,0.4); */
+	}
+	.button.button-clear.button-speed {
+		font-weight: 900;
+		font-size: smaller;
+		min-width: 60px;
+	}
+	a {
+		text-decoration: none;
+	}
+	.statbar {
+		font-size: 10px;
+		bottom: 0;
+		float: right;
+		padding: 2px 5px 2px 5px; /* top right bottom left */
+	}
+	i.state {
+		font-weight: 900;
+		font-size: 15px;
+		/*text-shadow: 0px 0px 3px rgba(0,0,0,0.4); */
+	}
+	.indicator {
+		font-size: 10px;
+		top: 0;
+		float: left;
+		padding: 2px 5px 2px 5px;
+	}
+	ion-delete-button.icon {
+		padding: 2px 2px;
+	}
+	ion-reorder-button.icon {
+		padding: 0px 15px;
+	}
+	/*
+	div.action-sheet-group > button.button {
+		color: #ff0000;
+	}
+	*/
+</style>
+<ion-view>
+	<ion-header-bar class="bar-dark">
+		<div class="buttons">
+			<button class="button button-light button-clear ion-plus-circled" style="width: 30px" ng-click="addUrl()"></button>
+			<button class="button button-light button-clear ion-ios7-play" style="width: 30px" ng-click="resumeAll()"></button>
+			<button class="button button-light button-clear ion-pause" style="width: 30px" ng-click="pauseAll()"></button>
+		</div>
+		<h1 class="title"></h1>
+		<div class="buttons">
+			<button class="button button-light button-clear button-speed" ng-class="hasRate(downloadRate)? 'button-balanced':'button-light'">
+				<span class="ion-arrow-down-a" ng-if="downloadRate !== '?'"></span> {{downloadRate}}
+			</button>
+			<button class="button button-light button-clear button-speed" ng-class="hasRate(uploadRate)? 'button-energized':'button-light'">
+				<span class="ion-arrow-up-a" ng-if="uploadRate !== '?'"></span> {{uploadRate}}
+			</button>
+		</div>
+	</ion-header-bar>
+	<ion-content delegate-handle="torrents-content">
+		<div ng-if="!active" class="padding">
+			No torrents, or server not connected.
+		</div>
+		<ion-list show-delete="shouldShowDelete" show-reorder="shouldShowReorder" can-swipe="true" delegate-handle="torrents" detect-swipe>
+			<ion-item ng-repeat="torrent in torrents | orderBy:'name'" type="item-text-wrap" ng-class="['item-nopadding']">
+				<!--
+				<ion-delete-button class="ion-minus-circled" ng-click="onDelete(torrent)"></ion-delete-button>
+				<ion-reorder-button class="ion-navicon" ng-click="onReorder(torrent, $fromIndex, $toIndex)"></ion-reorder-button>
+				-->
+				<ion-option-button class="button button-assertive" ng-click="onDelete(torrent)">
+					<i class="ion-trash-a"></i>
+				</ion-option-button>
+				<ion-option-button class="button" ng-class="isPaused(torrent)? 'button-balanced':'button-stable'" ng-click="toggleState(torrent)">
+					<i ng-class="isPaused(torrent)? 'ion-ios7-play':'ion-pause'"></i>
+				</ion-option-button>
+				<div dm-progress="{{torrent.progress}}" dm-state="{{torrent.state}}" dm-height="18px" ng-click="handleTorrent(torrent)">
+					<h5 class="indicator"><i class="state" ng-class="{'ion-ios7-help-empty': torrent.state === 'Checking', 'ion-pause': torrent.state === 'Paused', 'ion-ios7-arrow-up': torrent.state === 'Seeding', 'ion-ios7-arrow-down': torrent.state === 'Downloading'}" ng-click="toggleState(torrent)"></i></h5>
+					<h5 class="indicator">{{getProgress(torrent)}}%</h5>
+					<h5 class="statbar dark"><i class="ion-arrow-up-a" style="height: 10px"></i> {{getSpeed(torrent.upload_payload_rate)}}</h5>
+					<h5 class="statbar dark"><i class="ion-arrow-down-a" style="height: 10px"></i> {{getSpeed(torrent.download_payload_rate)}}</h5>
+					<h5 class="statbar" ng-if="torrent.state === 'Downloading' &amp;&amp; torrent.eta !== 0"><i class="ion-clock" style="height: 10px"></i> {{getEta(torrent)}}</h5>
+					<a class="item-repad" ng-href="#/tab/torrent/{{torrent.id}}">
+						<span style="text-overflow: ellipsis">{{torrent.name}}</span>
+					</a>
+				</div>
+			</ion-item>
+		</ion-list>
+	</ion-content>
+</ion-view>

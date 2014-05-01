@@ -1,0 +1,19 @@
+<ion-view title="Settings">
+	<ion-header-bar class="bar-dark">
+		<h1 class="title">Settings</h1>
+	</ion-header-bar>
+	<ion-content>
+		<ion-list>
+			<label class="item item-input item-stacked-label">
+				<span class="input-label">Deluge Server</span>
+				<input type="url" placeholder="http://myhost:8112" name="server" ng-model="settings.server">
+			</label>
+			<label class="item item-input item-stacked-label">
+				<span class="input-label">Deluge Password</span>
+				<input type="password" placeholder="" name="password" ng-model="settings.password">
+			</label>
+			<button class="button button-block button-positive" ng-click="saveSettings()">Save</button>
+			<button class="button button-block button-assertive" ng-click="resetSettings()">Reset</button>
+		</ion-list>
+	</ion-content>
+</ion-view>

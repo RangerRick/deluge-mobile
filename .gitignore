@@ -1,0 +1,4 @@
+*.keystore
+*.sw*
+platforms/^.*
+www/lib/bower_components
