@@ -94,7 +94,7 @@ angular.module('dm.services', [
 			if (data.result) {
 				deferred.resolve(data.id);
 			} else {
-				console.log('successful response with no result: ' + angular.toJson(data, true));
+				console.log('auth.login: successful response with no result: ' + angular.toJson(data, true));
 				deferred.reject(false);
 			}
 		}, function(error) {

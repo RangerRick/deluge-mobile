@@ -9,6 +9,12 @@ angular.module('DelugeMobile', [
 
 	$stateProvider
 
+	.state('main', {
+		url: '/downloads',
+		templateUrl: 'templates/downloads-index.html',
+		controller: 'DownloadsIndexCtrl'
+	})
+	/*
 	// setup an abstract state for the tabs directive
 	.state('tab', {
 		url: "/tab",
@@ -45,14 +51,54 @@ angular.module('DelugeMobile', [
 			}
 		}
 	});
+	
+	*/
 
 	// if none of the above states are matched, use this as the fallback
-	$urlRouterProvider.otherwise('/tab/downloads');
+	$urlRouterProvider.otherwise('/downloads');
 
-}]).run(['$q', '$interval', '$rootScope', '$ionicPopup', '$angularCacheFactory', 'DelugeService', function($q, $interval, $rootScope, $ionicPopup, $angularCacheFactory, deluge) {
+}]).run(['$q', '$interval', '$rootScope', '$ionicPopup', '$angularCacheFactory', '$window', 'storage', 'DelugeService', function($q, $interval, $rootScope, $ionicPopup, $angularCacheFactory, $window, storage, deluge) {
 	$angularCacheFactory('torrentCache', {
 		maxAge: 5 * 60 * 1000, // 5 minutes
 		deleteOnExpire: 'aggressive'
+	});
+
+	var addClipboardTorrent = function() {
+		cordova.plugins.clipboard.paste(function(text) {
+			if (text === undefined || text === null) {
+				console.log('unknown clipboard contents');
+				return;
+			}
+
+			if (text.indexOf('http://') === 0 || text.indexOf('https://') === 0 || text.indexOf('magnet:') === 0) {
+				console.log('prompt to open: ' + text);
+				$ionicPopup.confirm({
+					title: 'Add URL?',
+					subTitle: 'Would you like to add this URL in Deluge?<br/><br/>' + text,
+					cancelText: 'Cancel',
+					okText: 'Add'
+				}).then(function(result) {
+					if (result) {
+						console.log('Adding: ' + text);
+						deluge.add(text);
+					} else {
+						console.log("Don't add the URL from the clipboard.");
+					}
+				});
+			} else {
+				console.log('unknown clipboard contents');
+			}
+		}, function(error) {
+			console.log('clipboard error: ' + error);
+		});
+	};
+
+	ionic.Platform.ready(function() {
+		console.log('Ionic is Ready.');
+		var settings = storage.get('dm.settings');
+		if (settings.server && settings.password) {
+			addClipboardTorrent();
+		}
 	});
 
 	var registerListeners = function(sessionId) {

@@ -62,6 +62,7 @@
 <ion-view>
 	<ion-header-bar class="bar-dark">
 		<div class="buttons">
+			<button class="button button-light button-clear ion-gear-a" style="width: 30px" ng-click="openSettings()"></button>
 			<button class="button button-light button-clear ion-plus-circled" style="width: 30px" ng-click="addUrl()"></button>
 			<button class="button button-light button-clear ion-ios7-play" style="width: 30px" ng-click="resumeAll()"></button>
 			<button class="button button-light button-clear ion-pause" style="width: 30px" ng-click="pauseAll()"></button>
@@ -94,10 +95,10 @@
 				</ion-option-button>
 				<div dm-progress="{{torrent.progress}}" dm-state="{{torrent.state}}" dm-height="18px" ng-click="handleTorrent(torrent)">
 					<h5 class="indicator" style="width: 20px"><i class="state" ng-class="{'ion-ios7-help-empty': torrent.state === 'Checking', 'ion-pause': torrent.state === 'Paused', 'ion-ios7-arrow-up': torrent.state === 'Seeding', 'ion-ios7-arrow-down': torrent.state === 'Downloading'}" ng-click="toggleState(torrent)"></i></h5>
-					<h5 class="indicator" style="width: 60px; text-align: right">{{getProgress(torrent)}}%</h5>
-					<h5 class="statbar dark"><i class="ion-arrow-up-a" style="height: 10px"></i> {{getSpeed(torrent.upload_payload_rate)}}</h5>
-					<h5 class="statbar dark"><i class="ion-arrow-down-a" style="height: 10px"></i> {{getSpeed(torrent.download_payload_rate)}}</h5>
-					<h5 class="statbar" ng-if="torrent.state === 'Downloading' &amp;&amp; torrent.eta !== 0"><i class="ion-clock" style="height: 10px"></i> {{getEta(torrent)}}</h5>
+					<h5 class="indicator" style="width: 60px; text-align: right">{{toProgress(torrent.progress)}}%</h5>
+					<h5 class="statbar dark"><i class="ion-arrow-up-a" style="height: 10px"></i> {{toSpeed(torrent.upload_payload_rate)}}</h5>
+					<h5 class="statbar dark"><i class="ion-arrow-down-a" style="height: 10px"></i> {{toSpeed(torrent.download_payload_rate)}}</h5>
+					<h5 class="statbar" ng-if="torrent.state === 'Downloading' &amp;&amp; torrent.eta !== 0"><i class="ion-clock" style="height: 10px"></i> {{toEta(torrent.eta)}}</h5>
 					<a class="item-repad" ng-href="#/tab/torrent/{{torrent.id}}">
 						<span style="text-overflow: ellipsis">{{torrent.name}}</span>
 					</a>

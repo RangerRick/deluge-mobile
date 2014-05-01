@@ -45,36 +45,12 @@ angular.module('dm.controllers', [
 	};
 })
 	
-.controller('SettingsCtrl', ['$rootScope', '$scope', '$timeout', '$angularCacheFactory', 'storage', function($rootScope, $scope, $timeout, $angularCacheFactory, storage) {
-	console.log('Settings Controller Initialized.');
-	$scope.settings = storage.get('dm.settings') || {};
-
-	$scope.saveSettings = function() {
-		var settings = storage.get('dm.settings') || {};
-		var changed = ($scope.settings.server !== settings.server || $scope.settings.password !== settings.password);
-		console.log('saveSettings changed=' + changed + ': ' + angular.toJson($scope.settings, true));
-		if (changed) {
-			storage.set('dm.settings', $scope.settings);
-			$timeout(function() {
-				var cache = $angularCacheFactory.get('torrentCache');
-				if (cache) {
-					cache.removeAll();
-				}
-				$rootScope.$broadcast('dm.settings-changed', $scope.settings);
-			});
-		}
-	};
-	$scope.resetSettings = function() {
-		$scope.settings = storage.get('dm.settings') || {};
-		console.log('resetSettings: ' + angular.toJson($scope.settings, true));
-	};
-}])
-.controller('DownloadsIndexCtrl', ['$rootScope', '$scope', '$window', '$timeout', '$ionicModal', '$ionicPopup', '$ionicActionSheet', '$ionicListDelegate', '$ionicScrollDelegate', '$angularCacheFactory', 'DelugeService', function($rootScope, $scope, $window, $timeout, $ionicModal, $ionicPopup, $ionicActionSheet, $ionicListDelegate, $ionicScrollDelegate, $angularCacheFactory, DelugeService) {
+.controller('DownloadsIndexCtrl', ['$rootScope', '$scope', '$window', '$timeout', '$ionicModal', '$ionicPopup', '$ionicActionSheet', '$ionicListDelegate', '$ionicScrollDelegate', '$angularCacheFactory', 'storage', 'DelugeService', function($rootScope, $scope, $window, $timeout, $ionicModal, $ionicPopup, $ionicActionSheet, $ionicListDelegate, $ionicScrollDelegate, $angularCacheFactory, storage, DelugeService) {
 	console.log('Downloads Controller Initialized.');
 	var sizes_long = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
 	var sizes_short = ['B', 'K', 'M', 'G', 'T'];
 
-	$scope.getSpeed = function(bytes, useShort) {
+	$scope.toSpeed = function(bytes, useShort) {
 		if (bytes === 0 || bytes === undefined || bytes === NaN) return '0';
 		var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1000)));
 		var size = useShort? sizes_short[i] : sizes_long[i];
@@ -90,12 +66,12 @@ angular.module('dm.controllers', [
 		}
 	};
 
-	$scope.getEta = function(torrent) {
-		return moment().add('seconds', torrent.eta).fromNow(true);
+	$scope.toEta = function(eta) {
+		return moment().add('seconds', eta).fromNow(true);
 	};
 
-	$scope.getProgress = function(torrent) {
-		var value = parseFloat(torrent.progress);
+	$scope.toProgress = function(percent) {
+		var value = parseFloat(percent);
 		return value.toFixed(2);
 	};
 
@@ -106,6 +82,8 @@ angular.module('dm.controllers', [
 
 	$scope.active = false;
 	$scope.swiped = false;
+
+	$scope.settings = storage.get('dm.settings') || {};
 
 	$scope.reportEvent = function(evt) {
 		$scope.swiped = true;
@@ -120,8 +98,8 @@ angular.module('dm.controllers', [
 		var downloadRate, uploadRate;
 
 		if (stats) {
-			$scope.downloadRate = $scope.getSpeed(stats.download_rate, true);
-			$scope.uploadRate   = $scope.getSpeed(stats.upload_rate,   true);
+			$scope.downloadRate = $scope.toSpeed(stats.download_rate, true);
+			$scope.uploadRate   = $scope.toSpeed(stats.upload_rate,   true);
 		} else {
 			$scope.downloadRate = $scope.uploadRate = '?';
 		}
@@ -131,24 +109,32 @@ angular.module('dm.controllers', [
 		$ionicScrollDelegate.resize();
 	};
 
+	$scope.toSize = function(size) {
+		return $scope.toSpeed(size, true);
+	};
+
+	$scope.closeModal = function(modal) {
+		if (modal) {
+			modal.hide();
+		} else {
+			console.log('WARNING!  No modal specified!');
+		}
+	};
+
 	$ionicModal.fromTemplateUrl('templates/torrent-view.html', {
 		animation: 'slide-in-up',
-		focusFirstInput: true
+		focusFirstInput: true,
+		scope: $scope
 	}).then(function(modal) {
-		$scope.modal = modal;
-		modal.scope.getSize = function(size) {
-			return $scope.getSpeed(size, true);
-		};
-		modal.scope.getProgress = function(percent) {
-			return parseFloat(percent).toFixed(2);
-		};
-		modal.scope.closeModal = function() {
-			$scope.modal.hide();
-		};
+		$scope.torrentDetailsView = modal;
 	});
-	$scope.$on('$destroy', function() {
-		$scope.modal.remove();
-		$scope.modal = undefined;
+	
+	$ionicModal.fromTemplateUrl('templates/settings.html', {
+		animation: 'slide-in-up',
+		focusFirstInput: true,
+		scope: $scope
+	}).then(function(modal) {
+		$scope.settingsView = modal;
 	});
 
 	$scope.hasRate = function(value) {
@@ -157,6 +143,34 @@ angular.module('dm.controllers', [
 		} else {
 			return true;
 		}
+	};
+
+	$scope.openSettings = function() {
+		$scope.settingsView.show();
+	};
+
+	$scope.saveSettings = function() {
+		console.log('saveSettings');
+		var settings = storage.get('dm.settings') || {};
+		var changed = ($scope.settings.server !== settings.server || $scope.settings.password !== settings.password);
+		console.log('saveSettings changed=' + changed + ': ' + angular.toJson($scope.settings, true));
+		if (changed) {
+			storage.set('dm.settings', $scope.settings);
+			$timeout(function() {
+				var cache = $angularCacheFactory.get('torrentCache');
+				if (cache) {
+					cache.removeAll();
+				}
+				$rootScope.$broadcast('dm.settings-changed', $scope.settings);
+			});
+		}
+		$scope.closeModal($scope.settingsView);
+	};
+
+	$scope.resetSettings = function() {
+		$scope.settings = storage.get('dm.settings') || {};
+		console.log('resetSettings: ' + angular.toJson($scope.settings, true));
+		$scope.closeModal($scope.settingsView);
 	};
 
 	$scope.closeOptions = function() {
@@ -169,8 +183,8 @@ angular.module('dm.controllers', [
 		if ($scope.swiped) {
 			$scope.closeOptions();
 		} else {
-			$scope.modal.scope.torrent = torrent;
-			$scope.modal.show();
+			$scope.torrentDetailsView.scope.torrent = torrent;
+			$scope.torrentDetailsView.show();
 		}
 	};
 
@@ -262,7 +276,14 @@ angular.module('dm.controllers', [
 	$scope.onReorder = function(torrent, from, to) {
 		console.log('Moving ' + torrent.name + ' from ' + from + ' to ' + to);
 	};
-	
+
+	$scope.$on('$destroy', function() {
+		$scope.torrentDetailsView.remove();
+		$scope.torrentDetailsView = undefined;
+		$scope.settingsView.remove();
+		$scope.settingsView = undefined;
+	});
+
 	$rootScope.$on('dm.ui-error', function(ev, err) {
 		//$window.alert('ERROR: ' + err);
 	});

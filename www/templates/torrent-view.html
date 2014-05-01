@@ -9,9 +9,9 @@
 		<ion-list>
 			<ion-item class="item-text-wrap"><h2>Name</h2><p>{{torrent.name}}</p></ion-item>
 			<ion-item><h2>Hash</h2><p>{{torrent.hash}}</p></ion-item>
-			<ion-item><h2>Progress</h2><p>{{getProgress(torrent.progress)}}%</p></ion-item>
+			<ion-item><h2>Progress</h2><p>{{toProgress(torrent.progress)}}%</p></ion-item>
 			<ion-item class="item-text-wrap"><h2>Path</h2><p>{{torrent['save_path']}}</p></ion-item>
-			<ion-item><h2>Total Size</h2><p>{{getSize(torrent['total_size'])}}</p></ion-item>
+			<ion-item><h2>Total Size</h2><p>{{toSize(torrent['total_size'])}}</p></ion-item>
 		</ion-list>
 	</ion-content>
 </div>
