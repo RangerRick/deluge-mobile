@@ -35,7 +35,7 @@ angular.module('dm.services', [
 			server += '/';
 		}
 
-		console.log('makeRequest to ' + server + ':',data);
+		console.log('makeRequest to ' + server + ': ' + angular.toJson(data));
 		$http.post(
 			server + 'json',
 			data
@@ -69,8 +69,10 @@ angular.module('dm.services', [
 	var checkSession = function() {
 		var deferred = $q.defer();
 		makeRequest({'method':'auth.check_session'}).then(function(data) {
+			console.log('auth.check_session: ' + angular.toJson(data, true));
 			deferred.resolve(data.result);
 		}, function(error) {
+			console.log('auth.check_session failed: ' + error);
 			deferred.reject(error);
 		});
 		return deferred.promise;
@@ -88,6 +90,7 @@ angular.module('dm.services', [
 		}
 
 		makeRequest({'method':'auth.login', 'params':[settings.password]}).then(function(data) {
+			console.log('auth.login: ' + angular.toJson(data, true));
 			if (data.result) {
 				deferred.resolve(data.id);
 			} else {
@@ -130,6 +133,7 @@ angular.module('dm.services', [
 	var connected = function() {
 		var deferred = $q.defer();
 		makeRequest({'method':'web.connected'}).then(function(data) {
+			console.log('web.connected: ' + angular.toJson(data, true));
 			deferred.resolve(true);
 		}, function(error) {
 			deferred.reject(error);
@@ -179,6 +183,7 @@ angular.module('dm.services', [
 			if (data.error) {
 				deferred.reject(error);
 			} else {
+				console.log('web.update_ui: ' + angular.toJson(data, true));
 				deferred.resolve(data.result);
 			}
 			updateInProgress = false;
@@ -206,12 +211,14 @@ angular.module('dm.services', [
 	var assertLoggedIn = function() {
 		var deferred = $q.defer();
 
+		/*
 		if (active) {
 			$timeout(function() {
 				deferred.resolve(true);
 			});
 			return deferred.promise;
 		};
+		*/
 
 		if ($rootScope.sessionId) {
 			checkSession($rootScope.sessionId).then(function(ready) {

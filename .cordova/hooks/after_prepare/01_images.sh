@@ -21,3 +21,15 @@ cp 'www/res/screen/ios/screen-ipad-portrait.png'           'platforms/ios/Deluge
 cp 'www/res/screen/ios/screen-iphone-portrait-2x.png'      'platforms/ios/DelugeMobile/Resources/splash/Default@2x~iphone.png'
 cp 'www/res/screen/ios/screen-iphone-portrait.png'         'platforms/ios/DelugeMobile/Resources/splash/Default~iphone.png'
 cp 'www/res/screen/ios/screen-iphone-portrait-568h-2x.png' 'platforms/ios/DelugeMobile/Resources/splash/Default-568h@2x~iphone.png'
+
+cp 'www/res/icon/android/icon-36-ldpi.png'  'platforms/android/res/drawable-ldpi/icon.png'
+cp 'www/res/icon/android/icon-48-mdpi.png'  'platforms/android/res/drawable-mdpi/icon.png'
+cp 'www/res/icon/android/icon-72-hdpi.png'  'platforms/android/res/drawable-hdpi/icon.png'
+cp 'www/res/icon/android/icon-96-xhdpi.png' 'platforms/android/res/drawable-xhdpi/icon.png'
+cp 'www/res/icon/android/icon-96-xhdpi.png' 'platforms/android/res/drawable/icon.png'
+
+cp 'www/res/screen/android/screen-ldpi-landscape.png'  'platforms/android/res/drawable-ldpi/screen.9.png'
+cp 'www/res/screen/android/screen-mdpi-landscape.png'  'platforms/android/res/drawable-mdpi/screen.9.png'
+cp 'www/res/screen/android/screen-hdpi-landscape.png'  'platforms/android/res/drawable-hdpi/screen.9.png'
+cp 'www/res/screen/android/screen-xhdpi-landscape.png' 'platforms/android/res/drawable-xhdpi/screen.9.png'
+cp 'www/res/screen/android/screen-xhdpi-landscape.png' 'platforms/android/res/drawable/screen.9.png'

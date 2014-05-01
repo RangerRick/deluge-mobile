@@ -76,7 +76,7 @@ angular.module('dm.controllers', [
 	var sizes_short = ['B', 'K', 'M', 'G', 'T'];
 
 	$scope.getSpeed = function(bytes, useShort) {
-		if (bytes == 0) return '0';
+		if (bytes === 0 || bytes === undefined || bytes === NaN) return '0';
 		var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1000)));
 		var size = useShort? sizes_short[i] : sizes_long[i];
 		if (!useShort) {
@@ -268,7 +268,7 @@ angular.module('dm.controllers', [
 		//$window.alert('ERROR: ' + err);
 	});
 	$rootScope.$on('dm.ui-updated', function(ev, data) {
-		console.log('UI update:', ev, data);
+		console.log('UI update: ' + angular.toJson(data, true));
 		var existing = {};
 		var cache = $angularCacheFactory.get('torrentCache');
 		angular.forEach(cache.get('torrents'), function(torrent) {
