@@ -109,7 +109,6 @@ angular.module('dm.controllers', [
 	$scope.swiped = false;
 
 	$scope.reportEvent = function(evt) {
-		console.log('swipe left:', evt);
 		$scope.swiped = true;
 		return true;
 	};
@@ -183,7 +182,6 @@ angular.module('dm.controllers', [
 		} else if (torrent && torrent.state === 'Seeding') {
 			console.log('Pausing ' + torrent.name);
 			DelugeService.pause(torrent.hash);
-			torrent.state = 'Paused';
 		}
 		$scope.closeOptions();
 	};
@@ -215,7 +213,6 @@ angular.module('dm.controllers', [
 		var torrents = cache.get('torrents') || [];
 		angular.forEach(torrents, function(torrent) {
 			hashes.push(torrent.hash);
-			torrent.state = 'Paused';
 		});
 		console.log('Pausing ' + hashes);
 		DelugeService.pause(hashes);

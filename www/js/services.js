@@ -144,7 +144,7 @@ angular.module('dm.services', [
 			$timeout(function() {
 				deferred.reject();
 			});
-			return;
+			return deferred.promise;
 		}
 
 		updateInProgress = true;
@@ -280,6 +280,7 @@ angular.module('dm.services', [
 				}]]}).then(function(data) {
 					if (data.result) {
 						deferred.resolve(data.result);
+						_doUpdate();
 					} else {
 						deferred.reject(error);
 					}
@@ -326,6 +327,7 @@ angular.module('dm.services', [
 				deferred.reject(data.error);
 			} else {
 				deferred.resolve(data.result);
+				_doUpdate();
 			}
 		}, function(err) {
 			deferred.reject(err);
@@ -346,6 +348,7 @@ angular.module('dm.services', [
 				deferred.reject(data.error);
 			} else {
 				deferred.resolve(data.result);
+				_doUpdate();
 			}
 		}, function(err) {
 			deferred.reject(err);
