@@ -9,7 +9,7 @@
 	}
 	.item-repad {
 		height: 47px;
-		margin-left: -15px;
+		margin-left: -75px;
 		padding-top: 22px;
 		padding-bottom: 3px;
 		padding-left: 2px;
@@ -93,8 +93,8 @@
 					<i ng-class="isPaused(torrent)? 'ion-ios7-play':'ion-pause'"></i>
 				</ion-option-button>
 				<div dm-progress="{{torrent.progress}}" dm-state="{{torrent.state}}" dm-height="18px" ng-click="handleTorrent(torrent)">
-					<h5 class="indicator"><i class="state" ng-class="{'ion-ios7-help-empty': torrent.state === 'Checking', 'ion-pause': torrent.state === 'Paused', 'ion-ios7-arrow-up': torrent.state === 'Seeding', 'ion-ios7-arrow-down': torrent.state === 'Downloading'}" ng-click="toggleState(torrent)"></i></h5>
-					<h5 class="indicator">{{getProgress(torrent)}}%</h5>
+					<h5 class="indicator" style="width: 20px"><i class="state" ng-class="{'ion-ios7-help-empty': torrent.state === 'Checking', 'ion-pause': torrent.state === 'Paused', 'ion-ios7-arrow-up': torrent.state === 'Seeding', 'ion-ios7-arrow-down': torrent.state === 'Downloading'}" ng-click="toggleState(torrent)"></i></h5>
+					<h5 class="indicator" style="width: 60px; text-align: right">{{getProgress(torrent)}}%</h5>
 					<h5 class="statbar dark"><i class="ion-arrow-up-a" style="height: 10px"></i> {{getSpeed(torrent.upload_payload_rate)}}</h5>
 					<h5 class="statbar dark"><i class="ion-arrow-down-a" style="height: 10px"></i> {{getSpeed(torrent.download_payload_rate)}}</h5>
 					<h5 class="statbar" ng-if="torrent.state === 'Downloading' &amp;&amp; torrent.eta !== 0"><i class="ion-clock" style="height: 10px"></i> {{getEta(torrent)}}</h5>
