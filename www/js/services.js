@@ -35,19 +35,19 @@ angular.module('dm.services', [
 			server += '/';
 		}
 
-		console.log('makeRequest to ' + server + ': ' + angular.toJson(data));
+		//console.log('makeRequest to ' + server + ': ' + angular.toJson(data));
 		$http.post(
 			server + 'json',
 			data
 		).success(function(data, status, headers, config) {
 			if (data.error) {
-				console.log('makeRequest: successful response, but error flag set:',data);
+				console.log('makeRequest: successful response, but error flag set: ' + angular.toJson(data, true));
 				deferred.reject(data);
 			} else {
 				deferred.resolve(data);
 			}
 		}).error(function(data, status, headers, config) {
-			console.log('makeRequest: failure:',data);
+			console.log('makeRequest: failure: ' + angular.toJson(data));
 			deferred.reject(data);
 		});
 		
@@ -69,7 +69,7 @@ angular.module('dm.services', [
 	var checkSession = function() {
 		var deferred = $q.defer();
 		makeRequest({'method':'auth.check_session'}).then(function(data) {
-			console.log('auth.check_session: ' + angular.toJson(data, true));
+			//console.log('auth.check_session: ' + angular.toJson(data, true));
 			deferred.resolve(data.result);
 		}, function(error) {
 			console.log('auth.check_session failed: ' + error);
@@ -90,15 +90,15 @@ angular.module('dm.services', [
 		}
 
 		makeRequest({'method':'auth.login', 'params':[settings.password]}).then(function(data) {
-			console.log('auth.login: ' + angular.toJson(data, true));
+			//console.log('auth.login: ' + angular.toJson(data, true));
 			if (data.result) {
 				deferred.resolve(data.id);
 			} else {
-				console.log('successful response with no result:',data.error);
+				console.log('successful response with no result: ' + angular.toJson(data, true));
 				deferred.reject(false);
 			}
 		}, function(error) {
-			console.log('failure:',error);
+			console.log('failure: ' + error);
 			deferred.reject(false);
 		});
 		return deferred.promise;
@@ -110,11 +110,11 @@ angular.module('dm.services', [
 			if (data.result) {
 				deferred.resolve(data.id);
 			} else {
-				console.log('successful response with no result:',data.error);
+				console.log('successful response with no result: ' + angular.toJson(data, true));
 				deferred.reject(false);
 			}
 		}, function(error) {
-			console.log('failure:',error);
+			console.log('failure: ' + error);
 			deferred.reject(false);
 		});
 		return deferred.promise;
@@ -133,7 +133,7 @@ angular.module('dm.services', [
 	var connected = function() {
 		var deferred = $q.defer();
 		makeRequest({'method':'web.connected'}).then(function(data) {
-			console.log('web.connected: ' + angular.toJson(data, true));
+			// console.log('web.connected: ' + angular.toJson(data, true));
 			deferred.resolve(true);
 		}, function(error) {
 			deferred.reject(error);
@@ -183,7 +183,7 @@ angular.module('dm.services', [
 			if (data.error) {
 				deferred.reject(error);
 			} else {
-				console.log('web.update_ui: ' + angular.toJson(data, true));
+				// console.log('web.update_ui: ' + angular.toJson(data, true));
 				deferred.resolve(data.result);
 			}
 			updateInProgress = false;
@@ -264,7 +264,7 @@ angular.module('dm.services', [
 	var _getEvents = function() {
 		var deferred = $q.defer();
 		updateEvents().then(function(data) {
-			console.log('events:',data);
+			//console.log('events:',data);
 			deferred.resolve(data);
 		}, function(err) {
 			deferred.reject(err);
@@ -279,7 +279,7 @@ angular.module('dm.services', [
 				deferred.reject(error);
 			} else {
 				var tempfile = data.result;
-				console.log('downloaded to:',tempfile);
+				console.log('downloaded to: ' + tempfile);
 
 				makeRequest({'method':'web.add_torrents', 'params':[[{
 					path: tempfile,
@@ -307,9 +307,16 @@ angular.module('dm.services', [
 				if (timer !== null) {
 					$interval.cancel(timer);
 				}
+				
+				var settings = storage.get('dm.settings');
+				var refresh = dataRefresh;
+				if (settings.refresh && settings.refresh >= refresh) {
+					refresh = settings.refresh;
+				}
+
 				timer = $interval(function() {
 					_doUpdate();
-				}, dataRefresh);
+				}, refresh);
 				/*
 				$interval(function() {
 					_getEvents();

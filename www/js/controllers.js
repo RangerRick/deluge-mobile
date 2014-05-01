@@ -52,11 +52,10 @@ angular.module('dm.controllers', [
 	$scope.saveSettings = function() {
 		var settings = storage.get('dm.settings') || {};
 		var changed = ($scope.settings.server !== settings.server || $scope.settings.password !== settings.password);
-		console.log('saveSettings changed=' + changed,$scope.settings);
+		console.log('saveSettings changed=' + changed + ': ' + angular.toJson($scope.settings, true));
 		if (changed) {
 			storage.set('dm.settings', $scope.settings);
 			$timeout(function() {
-				console.log('settings changed:',$scope.settings);
 				var cache = $angularCacheFactory.get('torrentCache');
 				if (cache) {
 					cache.removeAll();
@@ -67,7 +66,7 @@ angular.module('dm.controllers', [
 	};
 	$scope.resetSettings = function() {
 		$scope.settings = storage.get('dm.settings') || {};
-		console.log('resetSettings:',$scope.settings);
+		console.log('resetSettings: ' + angular.toJson($scope.settings, true));
 	};
 }])
 .controller('DownloadsIndexCtrl', ['$rootScope', '$scope', '$window', '$timeout', '$ionicModal', '$ionicPopup', '$ionicActionSheet', '$ionicListDelegate', '$ionicScrollDelegate', '$angularCacheFactory', 'DelugeService', function($rootScope, $scope, $window, $timeout, $ionicModal, $ionicPopup, $ionicActionSheet, $ionicListDelegate, $ionicScrollDelegate, $angularCacheFactory, DelugeService) {
@@ -166,7 +165,7 @@ angular.module('dm.controllers', [
 	};
 
 	$scope.handleTorrent = function(torrent) {
-		console.log('handleTorrent:',torrent);
+		console.log('Torrent tapped: ' + torrent.name);
 		if ($scope.swiped) {
 			$scope.closeOptions();
 		} else {
@@ -232,7 +231,7 @@ angular.module('dm.controllers', [
 			destructiveText: 'Remove with Data',
 			cancelText: 'Cancel',
 			buttonClicked: function(index) {
-				console.log('Remove Torrent');
+				console.log('Remove Torrent: ' + torrent.name);
 				DelugeService.remove(torrent.hash, false);
 				for (var i = 0; i < $scope.torrents.length; i++) {
 					if ($scope.torrents[i].hash === torrent.hash) {
@@ -243,7 +242,7 @@ angular.module('dm.controllers', [
 				return true;
 			},
 			destructiveButtonClicked: function() {
-				console.log('Remove with Data');
+				console.log('Remove with Data: ' + torrent.name);
 				DelugeService.remove(torrent.hash, true);
 				for (var i = 0; i < $scope.torrents.length; i++) {
 					if ($scope.torrents[i].hash === torrent.hash) {
@@ -254,7 +253,7 @@ angular.module('dm.controllers', [
 				return true;
 			},
 			cancel: function() {
-				console.log('Cancel');
+				console.log('Cancel Remove');
 				return true;
 			}
 		});
@@ -268,7 +267,6 @@ angular.module('dm.controllers', [
 		//$window.alert('ERROR: ' + err);
 	});
 	$rootScope.$on('dm.ui-updated', function(ev, data) {
-		console.log('UI update: ' + angular.toJson(data, true));
 		var existing = {};
 		var cache = $angularCacheFactory.get('torrentCache');
 		angular.forEach(cache.get('torrents'), function(torrent) {
