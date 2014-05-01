@@ -17,6 +17,15 @@ It has been tested with Deluge 1.3.
 
 Deluge Mobile is Copyright (c) 2014 Benjamin Reed.
 
+App Store
+=========
+
+Deluge Mobile is available in the following app stores:
+
+* [Google Play (Android Devices)](https://play.google.com/store/apps/details?id=com.raccoonfink.deluge_mobile)
+* Amazon (coming soon!)
+* Apple (coming soon!)
+
 Screenshots
 ===========
 
