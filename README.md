@@ -16,3 +16,8 @@ Deluge Mobile is written using:
 It has been tested with Deluge 1.3.
 
 Deluge Mobile is Copyright (c) 2014 Benjamin Reed.
+
+Screenshots
+===========
+
+![Main Tab View](images/screenshot-main.png) ![Settings Tab View](images/screenshot-settings.png) ![About Tab View](images/screenshot-about.png) ![Add Torrent](images/screenshot-add.png) ![Torrent Details](images/screenshot-details.png)
