@@ -126,7 +126,7 @@ angular.module('dm.controllers', [
 
 	$ionicModal.fromTemplateUrl('templates/torrent-view.html', {
 		animation: 'slide-in-up',
-		focusFirstInput: true,
+		focusFirstInput: false,
 		scope: $scope
 	}).then(function(modal) {
 		$scope.torrentDetailsView = modal;
@@ -134,10 +134,20 @@ angular.module('dm.controllers', [
 	
 	$ionicModal.fromTemplateUrl('templates/settings.html', {
 		animation: 'slide-in-up',
-		focusFirstInput: true,
+		focusFirstInput: false,
 		scope: $scope
 	}).then(function(modal) {
 		$scope.settingsView = modal;
+	});
+
+	$scope.canRange = false;
+	
+	ionic.Platform.ready(function() {
+		if (ionic.Platform.isAndroid() && ionic.Platform.version() < 4.0) {
+			$scope.canRange = false;
+		} else {
+			$scope.canRange = true;
+		}
 	});
 
 	$scope.hasRate = function(value) {

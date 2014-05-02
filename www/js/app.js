@@ -80,7 +80,7 @@ angular.module('DelugeMobile', [
 					}
 
 					settings.lastUrl = text;
-					storage.put('dm.settings', settings);
+					storage.set('dm.settings', settings);
 
 					$ionicPopup.confirm({
 						title: 'Add URL?',

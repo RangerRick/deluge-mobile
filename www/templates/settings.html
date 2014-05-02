@@ -27,9 +27,10 @@
 			</label>
 			<label class="item item-input item-stacked-label">
 				<span class="input-label">Refresh Interval ({{(settings.refresh / 1000) | number}} seconds)</span>
-				<div class="range">
+				<div class="range" ng-if="canRange">
 					<input type="range" name="refresh" step="1000" min="5000" max="60000" ng-model="settings.refresh">
 				</div>
+				<input type="text" name="refresh" ng-model="settings.refresh" ng-if="!canRange">
 			</label>
 			<div class="item padding">
 				<button class="button button-block button-positive" ng-click="saveSettings()">Save</button>

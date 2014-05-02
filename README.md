@@ -17,7 +17,6 @@ App Store
 Deluge Mobile is available in the following app stores:
 
 * [Google Play (Android Devices)](https://play.google.com/store/apps/details?id=com.raccoonfink.deluge_mobile)
-* Amazon (coming soon!)
 * Apple (coming soon!)
 
 Screenshots
