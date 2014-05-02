@@ -24,6 +24,10 @@ if [ -d 'platforms/ios/DelugeMobile/Resources/icons' ]; then
 	cp 'www/res/screen/ios/screen-iphone-portrait-568h-2x.png' 'platforms/ios/DelugeMobile/Resources/splash/Default-568h@2x~iphone.png'
 fi
 
+if [ -d 'platforms/osx/DelugeMobile/Images.xcassets/AppIcon.appiconset' ]; then
+	cp 'www/res/icon/osx'/* 'platforms/osx/DelugeMobile/Images.xcassets/AppIcon.appiconset/'
+fi
+
 if [ -d 'platforms/android/res' ]; then
 	cp 'www/res/icon/android/icon-36-ldpi.png'  'platforms/android/res/drawable-ldpi/icon.png'
 	cp 'www/res/icon/android/icon-48-mdpi.png'  'platforms/android/res/drawable-mdpi/icon.png'

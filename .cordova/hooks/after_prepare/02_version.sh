@@ -5,6 +5,7 @@ NEWVERSION=`cat "$ROOT/www/config.xml" | grep '<widget' | sed -e 's,^.*version="
 echo "=== Setting version to $NEWVERSION ==="
 sed -e "s,@VERSION@,$NEWVERSION,g" "$ROOT/www/templates/settings.html" > "$ROOT/platforms/android/assets/www/templates/settings.html"
 sed -e "s,@VERSION@,$NEWVERSION,g" "$ROOT/www/templates/settings.html" > "$ROOT/platforms/ios/www/templates/settings.html"
+sed -e "s,@VERSION@,$NEWVERSION,g" "$ROOT/www/templates/settings.html" > "$ROOT/platforms/osx/www/templates/settings.html"
 
 MAJOR=`echo $NEWVERSION | cut -d. -f1`
 MINOR=`echo $NEWVERSION | cut -d. -f2`
