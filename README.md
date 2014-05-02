@@ -5,17 +5,11 @@ This is a simple mobile client for the Deluge torrent server.  It uses the same
 ReST/JSON API that the Deluge web UI uses.  It is licensed under the same terms
 as Deluge itself. (GPLv3)
 
-Deluge Mobile is written using:
-
-* [AngularJS](https://angularjs.org/)
-* [Ionic Framework](http://ionicframework.com/)
-* [angular-cache](https://github.com/jmdobry/angular-cache)
-* [angularLocalStorage](https://github.com/agrublev/angularLocalStorage)
-* [Moment.js](http://momentjs.com/)
-
 It has been tested with Deluge 1.3.
 
 Deluge Mobile is Copyright (c) 2014 Benjamin Reed.
+
+Release notes are in the [CHANGES](CHANGES.md) file.
 
 App Store
 =========
@@ -29,10 +23,18 @@ Deluge Mobile is available in the following app stores:
 Screenshots
 ===========
 
-![Main Tab View](images/screenshot-main.png) ![Delete, Pause/Resume](images/screenshot-options.png) ![Settings Tab View](images/screenshot-settings.png) ![About Tab View](images/screenshot-about.png) ![Add Torrent](images/screenshot-add.png) ![Torrent Details](images/screenshot-details.png)
+![Main Tab View](images/screenshot-main.png) ![Delete, Pause/Resume](images/screenshot-options.png) ![Settings Tab View](images/screenshot-settings.png) ![Add Torrent](images/screenshot-add.png) ![Torrent Details](images/screenshot-details.png)
 
 Acknowledgements
 ================
+
+Deluge Mobile is written using:
+
+* [AngularJS](https://angularjs.org/)
+* [Ionic Framework](http://ionicframework.com/)
+* [angular-cache](https://github.com/jmdobry/angular-cache)
+* [angularLocalStorage](https://github.com/agrublev/angularLocalStorage)
+* [Moment.js](http://momentjs.com/)
 
 The Deluge Mobile logo is a modified version of the ion-waterdrop icon from [Ionicons](http://ionicons.com/), originally licensed as the following:
 
