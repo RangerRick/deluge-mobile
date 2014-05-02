@@ -1,11 +1,6 @@
 <style>
-	.item {
-		border-top: 1px solid #555;
-	}
 	.item-complex .item-content {
 		padding: 0;
-		border-left: 1px solid #555;
-		border-right: 1px solid #555;
 	}
 	.item-repad {
 		height: 47px;
@@ -20,7 +15,13 @@
 		z-index: 100;
 		color: black;
 		font-weight: 900;
-		/* text-shadow: 1px 1px 2px rgba(100,100,100,0.4); */
+	}
+	.item.activated, .item-complex.activated .item-content {
+		color: white;
+		background-color: #eee;
+	}
+	.item-complex.active .item-content .item-repad, .item-complex.activated .item-content .item-repad {
+		color: #666;
 	}
 	.button.button-clear.button-speed {
 		font-weight: 900;
@@ -39,7 +40,6 @@
 	i.state {
 		font-weight: 900;
 		font-size: 15px;
-		/*text-shadow: 0px 0px 3px rgba(0,0,0,0.4); */
 	}
 	.indicator {
 		font-size: 10px;
@@ -54,7 +54,6 @@
 		padding: 0px 15px;
 	}
 	.action-sheet-group > button.button {
-		/* font-size: 12px; */
 		min-height: 20px;
 	}
 	.action-sheet-title {
@@ -89,10 +88,10 @@
 				<ion-delete-button class="ion-minus-circled" ng-click="onDelete(torrent)"></ion-delete-button>
 				<ion-reorder-button class="ion-navicon" ng-click="onReorder(torrent, $fromIndex, $toIndex)"></ion-reorder-button>
 				-->
-				<ion-option-button class="button button-assertive" ng-click="onDelete(torrent)">
+				<ion-option-button class="button-assertive" ng-click="onDelete(torrent)">
 					<i class="ion-trash-a"></i>
 				</ion-option-button>
-				<ion-option-button class="button" ng-class="isPaused(torrent)? 'button-balanced':'button-stable'" ng-click="toggleState(torrent)">
+				<ion-option-button g-class="isPaused(torrent)? 'button-balanced':'button-stable'" ng-click="toggleState(torrent)">
 					<i ng-class="isPaused(torrent)? 'ion-ios7-play':'ion-pause'"></i>
 				</ion-option-button>
 				<div dm-progress="{{torrent.progress}}" dm-state="{{torrent.state}}" dm-height="18px" ng-click="handleTorrent(torrent)">
