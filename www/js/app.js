@@ -64,33 +64,44 @@ angular.module('DelugeMobile', [
 	});
 
 	var addClipboardTorrent = function() {
-		cordova.plugins.clipboard.paste(function(text) {
-			if (text === undefined || text === null) {
-				console.log('unknown clipboard contents');
-				return;
-			}
+		if (cordova) {
+			cordova.plugins.clipboard.paste(function(text) {
+				if (text === undefined || text === null) {
+					console.log('unknown clipboard contents');
+					return;
+				}
 
-			if (text.indexOf('http://') === 0 || text.indexOf('https://') === 0 || text.indexOf('magnet:') === 0) {
-				console.log('prompt to open: ' + text);
-				$ionicPopup.confirm({
-					title: 'Add URL?',
-					subTitle: 'Would you like to add this URL in Deluge?<br/><br/>' + text,
-					cancelText: 'Cancel',
-					okText: 'Add'
-				}).then(function(result) {
-					if (result) {
-						console.log('Adding: ' + text);
-						deluge.add(text);
-					} else {
-						console.log("Don't add the URL from the clipboard.");
+				if (text.indexOf('http://') === 0 || text.indexOf('https://') === 0 || text.indexOf('magnet:') === 0) {
+					console.log('prompt to open: ' + text);
+					var settings = storage.get('dm.settings');
+					if (text === settings.lastUrl) {
+						console.log("We've already seen this URL: " + text);
+						return;
 					}
-				});
-			} else {
-				console.log('unknown clipboard contents');
-			}
-		}, function(error) {
-			console.log('clipboard error: ' + error);
-		});
+
+					settings.lastUrl = text;
+					storage.put('dm.settings', settings);
+
+					$ionicPopup.confirm({
+						title: 'Add URL?',
+						subTitle: 'Would you like to add this URL in Deluge?<br/><br/>' + text,
+						cancelText: 'Cancel',
+						okText: 'Add'
+					}).then(function(result) {
+						if (result) {
+							console.log('Adding: ' + text);
+							deluge.add(text);
+						} else {
+							console.log("Don't add the URL from the clipboard.");
+						}
+					});
+				} else {
+					console.log('unknown clipboard contents');
+				}
+			}, function(error) {
+				console.log('clipboard error: ' + error);
+			});
+		}
 	};
 
 	ionic.Platform.ready(function() {
