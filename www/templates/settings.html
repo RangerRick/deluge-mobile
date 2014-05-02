@@ -26,7 +26,7 @@
 				<input type="password" placeholder="" name="password" ng-model="settings.password">
 			</label>
 			<label class="item item-input item-stacked-label">
-				<span class="input-label">Refresh Interval: {{(settings.refresh / 1000) | number}} seconds</span>
+				<span class="input-label">Refresh Interval ({{(settings.refresh / 1000) | number}} seconds)</span>
 				<div class="range">
 					<input type="range" name="refresh" step="1000" min="5000" max="60000" ng-model="settings.refresh">
 				</div>
@@ -36,7 +36,7 @@
 				<button class="button button-block button-assertive" ng-click="resetSettings()">Reset</button>
 			</div>
 			<div class="row responsive-lg">
-				<h5 class="col" style="color: black; font-size: smaller; text-align: center">Deluge Mobile v@VERSION@, copyright &copy; 2014 Benjamin Reed.</h5>
+				<h5 class="col" style="color: black; font-size: xx-small; text-align: center">Deluge Mobile v@VERSION@, copyright &copy; 2014 Benjamin Reed.</h5>
 			</div>
 		</ion-list>
 	</ion-content>
