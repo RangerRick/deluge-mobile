@@ -24,6 +24,11 @@ Screenshots
 
 ![Main Tab View](images/screenshot-main.png) ![Delete, Pause/Resume](images/screenshot-options.png) ![Settings Tab View](images/screenshot-settings.png) ![Add Torrent](images/screenshot-add.png) ![Torrent Details](images/screenshot-details.png)
 
+Reporting Bugs or Feature Requests
+==================================
+
+Please open any bugs or feature requests in [the GitHub issue tracker](http://github.com/RangerRick/deluge-mobile/issues).
+
 Acknowledgements
 ================
 
