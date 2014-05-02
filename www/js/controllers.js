@@ -175,7 +175,7 @@ angular.module('dm.controllers', [
 
 	$scope.resetSettings = function() {
 		$scope.settings = storage.get('dm.settings') || {};
-		console.log('resetSettings: ' + angular.toJson($scope.settings, true));
+		console.log('resetSettings');
 		$scope.closeModal($scope.settingsView);
 	};
 
