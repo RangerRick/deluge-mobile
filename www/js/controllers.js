@@ -83,9 +83,10 @@ angular.module('dm.controllers', [
 	$scope.active = false;
 	$scope.swiped = false;
 
-	$scope.settings = storage.get('dm.settings') || {
-		refresh: 5000
-	};
+	$scope.settings = storage.get('dm.settings') || {};
+	if (!$scope.settings.refresh) {
+		$scope.settings.refresh = 5000;
+	}
 
 	$scope.reportEvent = function(evt) {
 		$scope.swiped = true;
