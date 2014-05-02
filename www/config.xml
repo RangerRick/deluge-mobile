@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.raccoonfink.deluge-mobile" version="1.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.raccoonfink.deluge-mobile" version="1.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>DelugeMobile</name>
     <description>Mobile UI for the Deluge torrent client, version 1.3 or later.</description>
     <author email="deluge@raccoonfink.com" href="http://www.raccoonfink.com/">Benjamin Reed</author>
