@@ -1,11 +1,12 @@
 #!/bin/sh
 
+NPM=`which npm 2>/dev/null`
+
+if [ -z "$NPM" ]; then
+	echo 'You must have npm from Node.JS (http://nodejs.org/) installed!'
+	exit 1
+fi
+
 sudo npm -g install bower ionic
 bower install
 ionic platform ios android
-
-# this is done with a hook now
-#cordova plugin add 'com.verso.cordova.clipboard'
-#cordova plugin add 'org.apache.cordova.console'
-#cordova plugin add 'org.apache.cordova.device'
-#cordova plugin add 'org.apache.cordova.statusbar'
