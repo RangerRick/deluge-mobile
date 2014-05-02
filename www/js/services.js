@@ -91,15 +91,19 @@ angular.module('dm.services', [
 
 		makeRequest({'method':'auth.login', 'params':[settings.password]}).then(function(data) {
 			//console.log('auth.login: ' + angular.toJson(data, true));
-			if (data.result) {
-				deferred.resolve(data.id);
+			if (data.error) {
+				console.log('auth.login: successful response with error: ' + angular.toJson(data, true));
+				deferred.reject(false);
 			} else {
-				console.log('auth.login: successful response with no result: ' + angular.toJson(data, true));
+				deferred.resolve(data.id);
+			}
+		}, function(data) {
+			console.log('failure: ' + data);
+			if (data.error && data.error.message) {
+				deferred.reject(data.error.message);
+			} else {
 				deferred.reject(false);
 			}
-		}, function(error) {
-			console.log('failure: ' + error);
-			deferred.reject(false);
 		});
 		return deferred.promise;
 	};

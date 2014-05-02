@@ -110,6 +110,8 @@ angular.module('DelugeMobile', [
 		if (settings.server && settings.password) {
 			addClipboardTorrent();
 		}
+	}, function() {
+		console.log('Not mobile!');
 	});
 
 	var registerListeners = function(sessionId) {
