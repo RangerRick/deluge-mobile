@@ -1,8 +1,17 @@
+<style>
+@media (min-width: 680px) {
+	.modal {
+		top: 0;
+		bottom: 0;
+		min-height: 100%;
+	}
+}
+</style>
 <div class="modal">
 	<ion-header-bar class="bar-dark">
 		<h1 class="title"></h1>
 		<div class="buttons">
-			<button class="button button-positive" ng-click="closeModal()" style="font-weight: bolder">Done</button>
+			<button class="button button-positive" ng-click="closeModal(torrentDetailsView)" style="font-weight: bolder">Done</button>
 		</div>
 	</ion-header-bar>
 	<ion-content scroll="true">
