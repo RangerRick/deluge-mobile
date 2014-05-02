@@ -153,7 +153,7 @@ angular.module('dm.controllers', [
 		console.log('saveSettings');
 		var settings = storage.get('dm.settings') || {};
 		var changed = ($scope.settings.server !== settings.server || $scope.settings.password !== settings.password);
-		console.log('saveSettings changed=' + changed + ': ' + angular.toJson($scope.settings, true));
+		console.log('saveSettings changed=' + changed);
 		if (changed) {
 			storage.set('dm.settings', $scope.settings);
 			$timeout(function() {
