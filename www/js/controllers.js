@@ -284,6 +284,71 @@ angular.module('dm.controllers', [
 		console.log('Moving ' + torrent.name + ' from ' + from + ' to ' + to);
 	};
 
+	var modifyRate = function(type, parameter) {
+		$ionicActionSheet.show({
+			buttons: [
+				{ text: '5 KiB/s' },
+				{ text: '10 KiB/s' },
+				{ text: '30 KiB/s' },
+				{ text: '80 KiB/s' },
+				{ text: '300 KiB/s' },
+				{ text: 'Unlimited' },
+				{ text: 'Other' }
+			],
+			titleText: 'Set ' + type + ' Speed:',
+			cancelText: 'Cancel',
+			cancel: function() {},
+			buttonClicked: function(index) {
+				var amount = 0;
+				switch (index) {
+					case 0:
+						amount = 5; break;
+					case 1:
+						amount = 10; break;
+					case 2:
+						amount = 30; break;
+					case 3:
+						amount = 80; break;
+					case 4:
+						amount = 300; break;
+					case 5:
+						amount = 0; break;
+					case 6:
+						$ionicPopup.prompt({
+							title: 'Set ' + type + ' Speed:',
+							inputType: 'number',
+							inputPlaceholder: 'KiB/s'
+						}).then(function(res) {
+							if (res) {
+								res = parseInt(res);
+								if (res != NaN) {
+									console.log('Setting ' + type + ' Rate To ' + res + ' KiB/s');
+									var options = {};
+									options[parameter] = "" + res;
+									DelugeService.setConfig(options);
+								}
+							}
+						});
+						return true;
+				}
+				
+				console.log('Setting ' + type + ' Rate To ' + amount + ' KiB/s');
+				var options = {};
+				options[parameter] = "" + amount;
+				DelugeService.setConfig(options);
+				return true;
+			}
+		});
+	};
+
+	$scope.modifyDownloadRate = function() {
+		modifyRate('Download', 'max_download_speed');
+	};
+
+	$scope.modifyUploadRate = function() {
+		modifyRate('Upload', 'max_upload_speed');
+	};
+
 	$scope.$on('$destroy', function() {
 		$scope.torrentDetailsView.remove();
 		$scope.torrentDetailsView = undefined;

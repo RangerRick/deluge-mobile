@@ -384,6 +384,20 @@ angular.module('dm.services', [
 		return deferred.promise;
 	};
 
+	var setConfig = function(parameters) {
+		var deferred = $q.defer();
+		makeRequest({'method':'core.set_config', 'params':[parameters]}).then(function(data) {
+			if (data && data.error !== undefined && data.error !== null) {
+				deferred.reject(data.error);
+			} else {
+				deferred.resolve(data.result);
+			}
+		}, function(err) {
+			deferred.reject(err);
+		});
+		return deferred.promise;
+	};
+
 	return {
 		'getMethods': getMethods,
 		'checkSession': checkSession,
@@ -396,6 +410,7 @@ angular.module('dm.services', [
 		'pause': pauseTorrents,
 		'resume': resumeTorrents,
 		'remove': removeTorrent,
-		'add': addTorrent
+		'add': addTorrent,
+		'setConfig': setConfig
 	};
 }]);

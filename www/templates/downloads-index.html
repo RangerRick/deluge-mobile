@@ -53,11 +53,13 @@
 	ion-reorder-button.icon {
 		padding: 0px 15px;
 	}
-	/*
-	div.action-sheet-group > button.button {
-		color: #ff0000;
+	.action-sheet-group > button.button {
+		/* font-size: 12px; */
+		min-height: 20px;
 	}
-	*/
+	.action-sheet-title {
+		font-size: 18px;
+	}
 </style>
 <ion-view>
 	<ion-header-bar class="bar-dark">
@@ -69,10 +71,10 @@
 		</div>
 		<h1 class="title"></h1>
 		<div class="buttons">
-			<button class="button button-light button-clear button-speed" ng-class="hasRate(downloadRate)? 'button-balanced':'button-light'">
+			<button class="button button-light button-clear button-speed" ng-class="hasRate(downloadRate)? 'button-balanced':'button-light'" ng-click="modifyDownloadRate()">
 				<span class="ion-arrow-down-a" ng-if="downloadRate !== '?'"></span> {{downloadRate}}
 			</button>
-			<button class="button button-light button-clear button-speed" ng-class="hasRate(uploadRate)? 'button-energized':'button-light'">
+			<button class="button button-light button-clear button-speed" ng-class="hasRate(uploadRate)? 'button-energized':'button-light'" ng-click="modifyUploadRate()">
 				<span class="ion-arrow-up-a" ng-if="uploadRate !== '?'"></span> {{uploadRate}}
 			</button>
 		</div>
