@@ -1,15 +1,15 @@
 <style>
 @media (min-width: 680px) {
-  .modal {
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    overflow: visible;
-    min-height: 240px;
-    width: 100%; }
-  .modal.ng-leave-active {
-    bottom: 0; } }
+	.modal {
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		overflow: visible;
+		min-height: 240px;
+		width: 100%;
+	}
+}
 </style>
 <div class="modal">
 	<ion-header-bar class="bar-dark">
@@ -25,9 +25,18 @@
 				<span class="input-label">Password</span>
 				<input type="password" placeholder="" name="password" ng-model="settings.password">
 			</label>
-			<div class="padding">
-			<button class="button button-block button-positive" ng-click="saveSettings()">Save</button>
-			<button class="button button-block button-assertive" ng-click="resetSettings()">Reset</button>
+			<label class="item item-input item-stacked-label">
+				<span class="input-label">Refresh Interval: {{(settings.refresh / 1000) | number}} seconds</span>
+				<div class="range">
+					<input type="range" name="refresh" step="1000" min="5000" max="60000" ng-model="settings.refresh">
+				</div>
+			</label>
+			<div class="item padding">
+				<button class="button button-block button-positive" ng-click="saveSettings()">Save</button>
+				<button class="button button-block button-assertive" ng-click="resetSettings()">Reset</button>
+			</div>
+			<div class="row responsive-lg">
+				<h5 class="col" style="color: black; font-size: smaller; text-align: center">Deluge Mobile v@VERSION@, copyright &copy; 2014 Benjamin Reed.</h5>
 			</div>
 		</ion-list>
 	</ion-content>
