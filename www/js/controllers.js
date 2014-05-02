@@ -83,7 +83,9 @@ angular.module('dm.controllers', [
 	$scope.active = false;
 	$scope.swiped = false;
 
-	$scope.settings = storage.get('dm.settings') || {};
+	$scope.settings = storage.get('dm.settings') || {
+		refresh: 5000
+	};
 
 	$scope.reportEvent = function(evt) {
 		$scope.swiped = true;
@@ -152,7 +154,11 @@ angular.module('dm.controllers', [
 	$scope.saveSettings = function() {
 		console.log('saveSettings');
 		var settings = storage.get('dm.settings') || {};
-		var changed = ($scope.settings.server !== settings.server || $scope.settings.password !== settings.password);
+		var changed = (
+			$scope.settings.server   !== settings.server ||
+			$scope.settings.password !== settings.password ||
+			$scope.settings.refresh  !== settings.refresh
+		);
 		console.log('saveSettings changed=' + changed);
 		if (changed) {
 			storage.set('dm.settings', $scope.settings);
