@@ -222,7 +222,11 @@ angular.module('dm.controllers', [
 			inputType: 'url',
 			inputPlaceholder: 'http://host/file.torrent'
 		}).then(function(url) {
-			DelugeService.add(url);
+			if (url) {
+				DelugeService.add(url);
+			} else {
+				console.log('addUrl: URL is invalid');
+			}
 		});
 	};
 

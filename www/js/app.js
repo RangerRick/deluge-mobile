@@ -107,7 +107,7 @@ angular.module('DelugeMobile', [
 	ionic.Platform.ready(function() {
 		console.log('Ionic is Ready.');
 		var settings = storage.get('dm.settings');
-		if (settings.server && settings.password) {
+		if (settings && settings.server && settings.password) {
 			addClipboardTorrent();
 		}
 	}, function() {
@@ -159,6 +159,19 @@ angular.module('DelugeMobile', [
 		registerListeners($rootScope.sessionId).then(function() {
 			deluge.connected().then(function() {
 				deluge.start();
+			}, function(error) {
+				if (error === 'get_hosts') {
+					console.log('Not connected to a host.');
+					deluge.getHosts().then(function(res) {
+						deluge.connect(res[0]).then(function() {
+							deluge.start();
+						}, function(error) {
+							console.log('Failed to connect to ' + res[0]);
+						});
+					});
+				} else {
+					console.log('Error: ' + error);
+				}
 			});
 		}, function(error) {
 			console.log('Error: ' + error);
@@ -166,7 +179,8 @@ angular.module('DelugeMobile', [
 	};
 
 	var init = function() {
-		deluge.start();
+		//deluge.start();
+		deluge.initialize();
 	};
 
 	init();

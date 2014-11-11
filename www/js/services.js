@@ -54,6 +54,100 @@ angular.module('dm.services', [
 		return deferred.promise;
 	};
 
+	var fsm;
+	fsm = StateMachine.create({
+		initial: 'uninitialized',
+		events: [
+			{ name: 'initialize', from: 'uninitialized', to: 'initialized' },
+			{ name: 'getSession', from: 'initialized', to: 'noSession' },
+			{ name: 'logIn',      from: ['noSession', 'initialized'], to: 'loggedIn' },
+			{ name: 'getHosts',   from: 'loggedIn', to: 'needHosts' },
+			{ name: 'connect',    from: 'needHosts', to: 'connect' },
+			{ name: 'ready',      from: ['loggedIn','connect'], to: 'ready' },
+			{ name: 'fail',       from: ['noSession', 'needHosts', 'connect', 'loggedIn'], to: 'failed' }
+		],
+		callbacks: {
+			oninitialize: function(event, from, to, data) {
+				console.log(event + ': ' + from + ' -> ' + to);
+
+				if ($rootScope.sessionId) {
+					checkSession($rootScope.sessionId).then(function(ready) {
+						if (ready) {
+							// ready, and logged in
+							console.log('ready fsm.loggedIn()');
+							fsm.logIn();
+						} else {
+							// session ID is invalid, get a new session
+							console.log('invalid fsm.noSession()');
+							fsm.getSession();
+						}
+					}, function(err) {
+						// something went wrong, get a new session
+						console.log('error fsm.noSession()');
+						fsm.getSession();
+					});
+				} else {
+					// we don't have a session stored, get a new session
+					console.log('empty fsm.noSession()');
+					fsm.getSession();
+				}
+			},
+			ongetSession: function(event, from, to, data) {
+				console.log(event + ': ' + from + ' -> ' + to);
+				login().then(function(sessionId) {
+					console.log('onGetSession: logged in: ' + sessionId);
+					$rootScope.sessionId = sessionId;
+					fsm.logIn();
+				}, function(error) {
+					console.log('onGetSession: login failed', error);
+					fsm.fail();
+				});
+			},
+			onloggedIn: function(event, from, to, data) {
+				console.log(event + ': ' + from + ' -> ' + to);
+				connected().then(function(res) {
+					console.log('Already connected.');
+					fsm.ready();
+				}, function(err) {
+					console.log('err=',err);
+					if (err === 'get_hosts') {
+						fsm.getHosts();
+					} else {
+						fsm.fail();
+					}
+				});
+			},
+			onneedHosts: function(event, from, to, data) {
+				console.log(event + ': ' + from + ' -> ' + to);
+				getHosts().then(function(res) {
+					fsm.connect(res);
+				}, function(err) {
+					console.log('err=',err);
+					fsm.fail();
+				});
+			},
+			onconnect: function(event, from, to, data) {
+				console.log(event + ': ' + from + ' -> ' + to);
+				connect(data).then(function(res) {
+					fsm.ready();
+				}, function(err) {
+					fsm.fail();
+				});
+			},
+			onready: function(event, from, to, data) {
+				console.log(event + ': ' + from + ' -> ' + to);
+				start();
+			},
+			onfailed: function(event, from, to, data) {
+				console.log(event + ': ' + from + ' -> ' + to);
+			}
+		}
+	});
+
+	var initialize = function() {
+		fsm.initialize();
+	};
+
 	var getMethods = function() {
 		var deferred = $q.defer();
 
@@ -137,7 +231,66 @@ angular.module('dm.services', [
 	var connected = function() {
 		var deferred = $q.defer();
 		makeRequest({'method':'web.connected'}).then(function(data) {
-			// console.log('web.connected: ' + angular.toJson(data, true));
+			if (data.id && data.id > 0 && data.result) {
+				deferred.resolve(true);
+			} else {
+				deferred.reject('get_hosts');
+			}
+		}, function(error) {
+			deferred.reject(error);
+		});
+		return deferred.promise;
+	};
+
+	var getHosts = function() {
+		var deferred = $q.defer();
+		makeRequest({'method':'web.get_hosts'}).then(function(data) {
+			if (data.id && data.id > 0 && data.result && data.result.length > 0) {
+				var first = data.result[0];
+				if (Array.isArray(first)) {
+					// this is a weird offline result, see if we can get status and return that
+					getHostStatus(first[0]).then(function(res) {
+						deferred.resolve(res);
+					}, function(err) {
+						console.error('no host status:',err);
+						deferred.reject(false);
+					});
+				} else {
+					deferred.resolve(first);
+				}
+			} else {
+				deferred.reject(false);
+			}
+		}, function(error) {
+			deferred.reject(error);
+		});
+		return deferred.promise;
+	};
+
+	var getHostStatus = function(hash) {
+		var deferred = $q.defer();
+		makeRequest({'method':'web.get_host_status','params':[hash]}).then(function(data) {
+			if (data.id && data.id > 0 && data.result && data.result.length > 0) {
+				var first = data.result[0];
+				if (Array.isArray(first)) {
+					// this is a weird offline result, see if we can get status and return that
+					console.error('getHostStatus: weird result:',first);
+					deferred.reject(false);
+				} else {
+					deferred.resolve(first);
+				}
+			} else {
+				deferred.reject(false);
+			}
+		}, function(error) {
+			deferred.reject(error);
+		});
+		return deferred.promise;
+	};
+
+	var connect = function(hash) {
+		var deferred = $q.defer();
+		makeRequest({'method':'web.connect', 'params':[hash]}).then(function(data) {
 			deferred.resolve(true);
 		}, function(error) {
 			deferred.reject(error);
@@ -256,13 +409,13 @@ angular.module('dm.services', [
 	};
 
 	var _doUpdate = function() {
-		assertLoggedIn().then(function() {
+		//assertLoggedIn().then(function() {
 			updateUI().then(function(data) {
 				$rootScope.$broadcast('dm.ui-updated', data);
 			}, function(err) {
 				$rootScope.$broadcast('dm.ui-error', err);
 			});
-		});
+		//});
 	};
 
 	var _getEvents = function() {
@@ -311,10 +464,10 @@ angular.module('dm.services', [
 				if (timer !== null) {
 					$interval.cancel(timer);
 				}
-				
+
 				var settings = storage.get('dm.settings');
 				var refresh = dataRefresh;
-				if (settings.refresh && settings.refresh >= refresh) {
+				if (settings && settings.refresh && settings.refresh >= refresh) {
 					refresh = settings.refresh;
 				}
 
@@ -404,10 +557,13 @@ angular.module('dm.services', [
 
 	return {
 		'getMethods': getMethods,
+		'initialize': initialize,
 		'checkSession': checkSession,
 		'login': login,
 		'registerEventListener': registerEventListener,
 		'connected': connected,
+		'getHosts': getHosts,
+		'connect': connect,
 		'updateUI': updateUI,
 		'refresh': _doUpdate,
 		'start': start,

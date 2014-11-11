@@ -83,7 +83,14 @@
 			No torrents, or server not connected.
 		</div>
 		<ion-list show-delete="shouldShowDelete" show-reorder="shouldShowReorder" can-swipe="true" delegate-handle="torrents" detect-swipe>
-			<ion-item ng-repeat="torrent in torrents | orderBy:'name'" type="item-text-wrap" ng-class="['item-nopadding']">
+			<ion-item
+				collection-repeat="torrent in torrents | orderBy:'name'"
+				collection-item-width="'100%'"
+				collection-item-height="47"
+				type="item-text-wrap"
+				ng-class="['item-nopadding']"
+				ng-style="{ height: 47, width: '100%' }">
+			<!-- <ion-item ng-repeat="torrent in torrents | orderBy:'name'" type="item-text-wrap" ng-class="['item-nopadding']"> -->
 				<!--
 				<ion-delete-button class="ion-minus-circled" ng-click="onDelete(torrent)"></ion-delete-button>
 				<ion-reorder-button class="ion-navicon" ng-click="onReorder(torrent, $fromIndex, $toIndex)"></ion-reorder-button>

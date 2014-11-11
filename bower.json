@@ -9,10 +9,13 @@
   "license": "Proprietary",
   "private": true,
   "dependencies": {
-    "moment": "~2.6.0",
-    "angular-cache": "~2.3.3",
-    "angularLocalStorage": "~0.1.7",
-    "angular-cookies": "1.2.12"
+    "moment": "~2.8.3",
+    "angular-cache": "~2.4.1",
+    "angularLocalStorage": "~0.1.8",
+    "angular-cookies": "1.2.25",
+    "javascript-state-machine": "~2.3.3"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "ionic": "driftyco/ionic-bower#1.0.0-beta.13"
+  }
 }
