@@ -1,5 +1,5 @@
 angular.module('dm.controllers', [
-	'jmdobry.angular-cache',
+	'angular-cache',
 	'angularLocalStorage',
 	'dm.services'
 ])
@@ -45,13 +45,15 @@ angular.module('dm.controllers', [
 	};
 })
 	
-.controller('DownloadsIndexCtrl', ['$rootScope', '$scope', '$window', '$timeout', '$ionicModal', '$ionicPopup', '$ionicActionSheet', '$ionicListDelegate', '$ionicScrollDelegate', '$angularCacheFactory', 'storage', 'DelugeService', function($rootScope, $scope, $window, $timeout, $ionicModal, $ionicPopup, $ionicActionSheet, $ionicListDelegate, $ionicScrollDelegate, $angularCacheFactory, storage, DelugeService) {
+.controller('DownloadsIndexCtrl', ['$rootScope', '$scope', '$window', '$timeout', '$ionicModal', '$ionicPopup', '$ionicActionSheet', '$ionicListDelegate', '$ionicScrollDelegate', 'CacheFactory', 'storage', 'DelugeService', function($rootScope, $scope, $window, $timeout, $ionicModal, $ionicPopup, $ionicActionSheet, $ionicListDelegate, $ionicScrollDelegate, CacheFactory, storage, DelugeService) {
 	console.log('Downloads Controller Initialized.');
 	var sizes_long = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
 	var sizes_short = ['B', 'K', 'M', 'G', 'T'];
 
+	var cache = CacheFactory('torrentCache');
+
 	$scope.toSpeed = function(bytes, useShort) {
-		if (bytes === 0 || bytes === undefined || bytes === NaN) return '0';
+		if (bytes === 0 || bytes === undefined || isNaN(bytes)) return '0';
 		var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1000)));
 		var size = useShort? sizes_short[i] : sizes_long[i];
 		if (!useShort) {
@@ -94,7 +96,6 @@ angular.module('dm.controllers', [
 	};
 
 	var updateUI = function() {
-		var cache = $angularCacheFactory.get('torrentCache');
 		$scope.torrents = cache.get('torrents') || [];
 		var stats = cache.get('stats');
 
@@ -165,6 +166,8 @@ angular.module('dm.controllers', [
 	$scope.saveSettings = function() {
 		console.log('saveSettings');
 		var settings = storage.get('dm.settings') || {};
+		console.log('old=',settings);
+		console.log('new=',$scope.settings);
 		var changed = (
 			$scope.settings.server   !== settings.server ||
 			$scope.settings.password !== settings.password ||
@@ -174,7 +177,6 @@ angular.module('dm.controllers', [
 		if (changed) {
 			storage.set('dm.settings', $scope.settings);
 			$timeout(function() {
-				var cache = $angularCacheFactory.get('torrentCache');
 				if (cache) {
 					cache.removeAll();
 				}
@@ -231,7 +233,6 @@ angular.module('dm.controllers', [
 	};
 
 	$scope.resumeAll = function() {
-		var cache = $angularCacheFactory.get('torrentCache');
 		var hashes = [];
 		var torrents = cache.get('torrents') || [];
 		angular.forEach(torrents, function(torrent) {
@@ -242,7 +243,6 @@ angular.module('dm.controllers', [
 	};
 
 	$scope.pauseAll = function() {
-		var cache = $angularCacheFactory.get('torrentCache');
 		var hashes = [];
 		var torrents = cache.get('torrents') || [];
 		angular.forEach(torrents, function(torrent) {
@@ -335,7 +335,7 @@ angular.module('dm.controllers', [
 						}).then(function(res) {
 							if (res) {
 								res = parseInt(res);
-								if (res != NaN) {
+								if (!isNaN(res)) {
 									console.log('Setting ' + type + ' Rate To ' + res + ' KiB/s');
 									var options = {};
 									options[parameter] = "" + res;
@@ -375,7 +375,6 @@ angular.module('dm.controllers', [
 	});
 	$rootScope.$on('dm.ui-updated', function(ev, data) {
 		var existing = {};
-		var cache = $angularCacheFactory.get('torrentCache');
 		angular.forEach(cache.get('torrents'), function(torrent) {
 			existing[torrent.hash] = torrent;
 		});
@@ -392,7 +391,7 @@ angular.module('dm.controllers', [
 				}
 				torrents.push(existingTorrent);
 			} else {
-				torrent['hash'] = index;
+				torrent.hash = index;
 				torrents.push(torrent);
 			}
 		});

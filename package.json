@@ -1,0 +1,56 @@
+{
+  "name": "DelugeMobile",
+  "version": "1.0.3",
+  "minSdk": "14",
+  "description": "A mobile client for the Deluge download server.",
+  "dependencies": {
+    "gulp": "*",
+    "gulp-concat": "*",
+    "gulp-minify-css": "*",
+    "gulp-rename": "*",
+    "gulp-sass": "*",
+    "gulp-util": "*"
+  },
+  "devDependencies": {
+    "bower": "*",
+    "commonmark": "*",
+    "cordova-android": "*",
+    "fs.extra": "*",
+    "gulp-jasmine": "*",
+    "gulp-jshint": "*",
+    "gulp-karma": "*",
+    "jshint": "*",
+    "jshint-stylish": "*",
+    "karma": "*",
+    "karma-chrome-launcher": "*",
+    "karma-firefox-launcher": "*",
+    "karma-jasmine": "*",
+    "karma-phantomjs-launcher": "*",
+    "karma-safari-launcher": "*",
+    "karma-webdriver-launcher": "*",
+    "line-reader": "*",
+    "shelljs": "*"
+  },
+  "cordovaPlugins": [
+    "cordova-plugin-console",
+    "cordova-plugin-device",
+    "cordova-plugin-file",
+    "cordova-plugin-statusbar",
+    {
+      "locator": "https://github.com/RangerRick/CordovaClipboard.git",
+      "id": "com.verso.cordova.clipboard"
+    }
+  ],
+  "cordovaPlatforms": [
+    {
+      "platform": "android",
+      "version": "3.7.1",
+      "locator": "android@3.7.1"
+    },
+    {
+      "platform": "ios",
+      "version": "3.8.0",
+      "locator": "ios"
+    }
+  ]
+}

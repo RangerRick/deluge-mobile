@@ -1,6 +1,12 @@
 {
-	"name": "Deluge Mobile",
-	"email": "deluge@raccoonfink.com",
-	"app_id": "",
-	"package_name": "com.raccoonfink.deluge-mobile"
+  "name": "Deluge Mobile",
+  "email": "deluge@raccoonfink.com",
+  "app_id": "7990a95c",
+  "package_name": "com.raccoonfink.deluge-mobile",
+  "proxies": [
+    {
+      "path": "/deluge",
+      "proxyUrl": "http://defiance.dyndns.org:8112/json"
+    }
+  ]
 }

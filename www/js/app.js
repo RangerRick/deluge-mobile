@@ -1,11 +1,16 @@
 angular.module('DelugeMobile', [
+	'ng',
 	'ionic',
-	'jmdobry.angular-cache',
+	'angular-cache',
 	'dm.services',
 	'dm.controllers'
 ])
 
-.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
+.config(['$httpProvider', '$stateProvider', '$urlRouterProvider', 'CacheFactoryProvider', function($httpProvider, $stateProvider, $urlRouterProvider, CacheFactoryProvider) {
+	angular.extend(CacheFactoryProvider.defaults, {
+		maxAge: 5 * 60 * 1000, // 5 minutes
+		deleteOnExpire: 'aggressive'
+	});
 
 	$stateProvider
 
@@ -50,19 +55,15 @@ angular.module('DelugeMobile', [
 				templateUrl: 'templates/about.html'
 			}
 		}
-	});
+	})
 	
 	*/
+	;
 
 	// if none of the above states are matched, use this as the fallback
 	$urlRouterProvider.otherwise('/downloads');
 
-}]).run(['$q', '$interval', '$rootScope', '$ionicPopup', '$angularCacheFactory', '$window', 'storage', 'DelugeService', function($q, $interval, $rootScope, $ionicPopup, $angularCacheFactory, $window, storage, deluge) {
-	$angularCacheFactory('torrentCache', {
-		maxAge: 5 * 60 * 1000, // 5 minutes
-		deleteOnExpire: 'aggressive'
-	});
-
+}]).run(['$q', '$interval', '$rootScope', '$ionicPopup', '$window', 'storage', 'DelugeService', function($q, $interval, $rootScope, $ionicPopup, $window, storage, deluge) {
 	var addClipboardTorrent = function() {
 		if (cordova) {
 			cordova.plugins.clipboard.paste(function(text) {

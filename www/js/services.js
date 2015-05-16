@@ -1,16 +1,18 @@
 angular.module('dm.services', [
-	'jmdobry.angular-cache',
-	'angularLocalStorage'
+	'ng',
+	'ionic',
+	'ngCookies',
+	'angularLocalStorage',
 ])
 
-.factory('DelugeService', ['$q', '$http', '$rootScope', '$interval', '$timeout', 'storage', function($q, $http, $rootScope, $interval, $timeout, storage) {
-	var dataRefresh  =  5 * 1000    // 5 seconds
+.factory('DelugeService', ['$q', '$cookieStore', '$http', '$rootScope', '$interval', '$timeout', 'storage', function($q, $cookieStore, $http, $rootScope, $interval, $timeout, storage) {
+	var dataRefresh  =  5 * 1000,   // 5 seconds
 		eventRefresh = 10 * 1000    // 30 seconds
 	;
 
 	var active = false;
 	var doRefresh = true;
-	var idcounter = 0;
+	var idcounter = 1;
 	var updateInProgress = false;
 	var timer = null;
 
@@ -35,11 +37,19 @@ angular.module('dm.services', [
 			server += '/';
 		}
 
-		//console.log('makeRequest to ' + server + ': ' + angular.toJson(data));
-		$http.post(
-			server + 'json',
-			data
-		).success(function(data, status, headers, config) {
+		var config = {
+			withCredentials: false,
+			headers: {
+				'Accept': 'application/json',
+				'Authorization': undefined,
+				'Content-type': 'application/json',
+				'X-Requested-With': 'XMLHttpRequest'
+			}
+		};
+
+		console.log('makeRequest to ' + server + ': ' + angular.toJson(data));
+		$http.post(server + 'json', data, config)
+		.success(function(data, status, headers, config) {
 			if (data.error) {
 				console.log('makeRequest: successful response, but error flag set: ' + angular.toJson(data, true));
 				deferred.reject(data);
@@ -56,9 +66,12 @@ angular.module('dm.services', [
 
 	var fsm;
 	fsm = StateMachine.create({
-		initial: 'uninitialized',
-		events: [
-			{ name: 'initialize', from: 'uninitialized', to: 'initialized' },
+		'initial': 'uninitialized',
+		'error': function(eventName, from, to, args, errorCode, errorMessage) {
+			console.log(eventName + ' ' + from + ' -> ' + to + ': ' + errorMessage, args, errorCode);
+		},
+		'events': [
+			{ name: 'initialize', from: ['uninitialized', 'initialized'], to: 'initialized' },
 			{ name: 'getSession', from: 'initialized', to: 'noSession' },
 			{ name: 'logIn',      from: ['noSession', 'initialized'], to: 'loggedIn' },
 			{ name: 'getHosts',   from: 'loggedIn', to: 'needHosts' },
@@ -66,31 +79,28 @@ angular.module('dm.services', [
 			{ name: 'ready',      from: ['loggedIn','connect'], to: 'ready' },
 			{ name: 'fail',       from: ['noSession', 'needHosts', 'connect', 'loggedIn'], to: 'failed' }
 		],
-		callbacks: {
+		'callbacks': {
 			oninitialize: function(event, from, to, data) {
 				console.log(event + ': ' + from + ' -> ' + to);
 
-				if ($rootScope.sessionId) {
+				getMethods().then(function(methods) {
+					console.log('oninitialize: got methods: ' + angular.toJson(methods));
 					checkSession($rootScope.sessionId).then(function(ready) {
 						if (ready) {
 							// ready, and logged in
-							console.log('ready fsm.loggedIn()');
+							console.log('oninitialize: session ready, calling fsm.loggedIn()');
 							fsm.logIn();
 						} else {
 							// session ID is invalid, get a new session
-							console.log('invalid fsm.noSession()');
+							console.log('oninitialize: invalid session, calling fsm.noSession()');
 							fsm.getSession();
 						}
 					}, function(err) {
 						// something went wrong, get a new session
-						console.log('error fsm.noSession()');
+						console.log('oninitialize: error, calling fsm.noSession()');
 						fsm.getSession();
 					});
-				} else {
-					// we don't have a session stored, get a new session
-					console.log('empty fsm.noSession()');
-					fsm.getSession();
-				}
+				});
 			},
 			ongetSession: function(event, from, to, data) {
 				console.log(event + ': ' + from + ' -> ' + to);
@@ -98,9 +108,9 @@ angular.module('dm.services', [
 					console.log('onGetSession: logged in: ' + sessionId);
 					$rootScope.sessionId = sessionId;
 					fsm.logIn();
-				}, function(error) {
-					console.log('onGetSession: login failed', error);
-					fsm.fail();
+				}, function(err) {
+					console.log('onGetSession: login failed', err);
+					fsm.fail(err);
 				});
 			},
 			onloggedIn: function(event, from, to, data) {
@@ -109,12 +119,7 @@ angular.module('dm.services', [
 					console.log('Already connected.');
 					fsm.ready();
 				}, function(err) {
-					console.log('err=',err);
-					if (err === 'get_hosts') {
-						fsm.getHosts();
-					} else {
-						fsm.fail();
-					}
+					fsm.getHosts();
 				});
 			},
 			onneedHosts: function(event, from, to, data) {
@@ -140,6 +145,7 @@ angular.module('dm.services', [
 			},
 			onfailed: function(event, from, to, data) {
 				console.log(event + ': ' + from + ' -> ' + to);
+				console.log('onfailed: data=' + angular.toJson(data));
 			}
 		}
 	});
@@ -153,8 +159,8 @@ angular.module('dm.services', [
 
 		makeRequest({'method':'system.listMethods'}).then(function(data) {
 			deferred.resolve(data.result);
-		}, function(error) {
-			deferred.reject(error);
+		}, function(err) {
+			deferred.reject(err);
 		});
 
 		return deferred.promise;
@@ -163,11 +169,11 @@ angular.module('dm.services', [
 	var checkSession = function() {
 		var deferred = $q.defer();
 		makeRequest({'method':'auth.check_session'}).then(function(data) {
-			//console.log('auth.check_session: ' + angular.toJson(data, true));
+			console.log('auth.check_session: ' + angular.toJson(data, true));
 			deferred.resolve(data.result);
-		}, function(error) {
-			console.log('auth.check_session failed: ' + error);
-			deferred.reject(error);
+		}, function(err) {
+			console.log('auth.check_session failed: ' + err);
+			deferred.reject(err);
 		});
 		return deferred.promise;
 	};
@@ -184,7 +190,7 @@ angular.module('dm.services', [
 		}
 
 		makeRequest({'method':'auth.login', 'params':[settings.password]}).then(function(data) {
-			//console.log('auth.login: ' + angular.toJson(data, true));
+			console.log('auth.login: ' + angular.toJson(data, true));
 			if (data.error) {
 				console.log('auth.login: successful response with error: ' + angular.toJson(data, true));
 				deferred.reject(false);
@@ -193,7 +199,7 @@ angular.module('dm.services', [
 			}
 		}, function(data) {
 			console.log('failure: ' + data);
-			if (data.error && data.error.message) {
+			if (data && data.error && data.error.message) {
 				deferred.reject(data.error.message);
 			} else {
 				deferred.reject(false);
@@ -211,8 +217,8 @@ angular.module('dm.services', [
 				console.log('successful response with no result: ' + angular.toJson(data, true));
 				deferred.reject(false);
 			}
-		}, function(error) {
-			console.log('failure: ' + error);
+		}, function(err) {
+			console.log('failure: ' + err);
 			deferred.reject(false);
 		});
 		return deferred.promise;
@@ -222,8 +228,8 @@ angular.module('dm.services', [
 		var deferred = $q.defer();
 		makeRequest({'method':'web.register_event_listener', 'params':[listener]}).then(function(data) {
 			deferred.resolve(true);
-		}, function(error) {
-			deferred.reject(error);
+		}, function(err) {
+			deferred.reject(err);
 		});
 		return deferred.promise;
 	};
@@ -236,8 +242,8 @@ angular.module('dm.services', [
 			} else {
 				deferred.reject('get_hosts');
 			}
-		}, function(error) {
-			deferred.reject(error);
+		}, function(err) {
+			deferred.reject(err);
 		});
 		return deferred.promise;
 	};
@@ -252,7 +258,7 @@ angular.module('dm.services', [
 					getHostStatus(first[0]).then(function(res) {
 						deferred.resolve(res);
 					}, function(err) {
-						console.error('no host status:',err);
+						console.log('no host status:',err);
 						deferred.reject(false);
 					});
 				} else {
@@ -261,8 +267,8 @@ angular.module('dm.services', [
 			} else {
 				deferred.reject(false);
 			}
-		}, function(error) {
-			deferred.reject(error);
+		}, function(err) {
+			deferred.reject(err);
 		});
 		return deferred.promise;
 	};
@@ -274,7 +280,7 @@ angular.module('dm.services', [
 				var first = data.result[0];
 				if (Array.isArray(first)) {
 					// this is a weird offline result, see if we can get status and return that
-					console.error('getHostStatus: weird result:',first);
+					console.log('getHostStatus: weird result:',first);
 					deferred.reject(false);
 				} else {
 					deferred.resolve(first);
@@ -282,8 +288,8 @@ angular.module('dm.services', [
 			} else {
 				deferred.reject(false);
 			}
-		}, function(error) {
-			deferred.reject(error);
+		}, function(err) {
+			deferred.reject(err);
 		});
 		return deferred.promise;
 	};
@@ -292,8 +298,8 @@ angular.module('dm.services', [
 		var deferred = $q.defer();
 		makeRequest({'method':'web.connect', 'params':[hash]}).then(function(data) {
 			deferred.resolve(true);
-		}, function(error) {
-			deferred.reject(error);
+		}, function(err) {
+			deferred.reject(err);
 		});
 		return deferred.promise;
 	};
@@ -344,8 +350,8 @@ angular.module('dm.services', [
 				deferred.resolve(data.result);
 			}
 			updateInProgress = false;
-		}, function(error) {
-			deferred.reject(error);
+		}, function(err) {
+			deferred.reject(err);
 			updateInProgress = false;
 		});
 		return deferred.promise;
@@ -359,8 +365,8 @@ angular.module('dm.services', [
 			} else {
 				deferred.resolve(data.result);
 			}
-		}, function(error) {
-			deferred.reject(error);
+		}, function(err) {
+			deferred.reject(err);
 		});
 		return deferred.promise;
 	};
@@ -448,12 +454,12 @@ angular.module('dm.services', [
 					} else {
 						deferred.reject(error);
 					}
-				}, function(error) {
-					deferred.reject(error);
+				}, function(err) {
+					deferred.reject(err);
 				});
 			}
-		}, function(error) {
-			deferred.reject(error);
+		}, function(err) {
+			deferred.reject(err);
 		});
 		return deferred.promise;
 	};

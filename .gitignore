@@ -1,5 +1,6 @@
 *.keystore
 *.sw*
-platforms/^.*
-www/lib/bower_components
+/platforms/
+/plugins/
+/www/lib/bower_components
 .DS_Store
